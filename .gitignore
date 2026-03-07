@@ -1,0 +1,15 @@
+# node
+node_modules
+dist
+build
+
+# springboot
+target
+*.log
+
+# env
+.env
+
+# IDE
+.vscode
+.idea

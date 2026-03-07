@@ -1,0 +1,12 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/rentmyapp
+    username: postgres
+    password: Parikshit@12
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+jwt:
+  secret: bXlTdXBlclNlY3JldEtleUZvckpXVEF1dGhTZXJ2aWNlMTIzNDU2
+  expiration: 86400000

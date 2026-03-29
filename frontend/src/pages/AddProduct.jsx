@@ -1,5 +1,5 @@
 import { useState } from "react";
-import api from "../api/axios";
+import api, { getErrorMessage } from "../api/axios";
 import { motion } from "framer-motion";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
@@ -48,7 +48,7 @@ const AddProduct = () => {
       navigate("/");
     } catch (err) {
       console.error(err);
-      toast.error("Failed to add product");
+      toast.error(getErrorMessage(err, "Failed to add product"));
     }
 
     setLoading(false);

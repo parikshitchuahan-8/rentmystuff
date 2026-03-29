@@ -1,5 +1,5 @@
 import { useState } from "react";
-import api from "../api/axios";
+import api, { getErrorMessage } from "../api/axios";
 import { useNavigate, Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import toast from "react-hot-toast";
@@ -11,17 +11,16 @@ export default function Register() {
     name: "",
     email: "",
     password: "",
-    role: "USER",
   });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await api.post("/auth/register", form);
+      await api.post("/auth/register", { ...form, role: "USER" });
       toast.success("Account created successfully!");
       navigate("/login");
     } catch (err) {
-      toast.error("Registration failed");
+      toast.error(getErrorMessage(err, "Registration failed"));
     }
   };
 
@@ -62,14 +61,9 @@ export default function Register() {
               onChange={(e) => setForm({ ...form, password: e.target.value })}
             />
 
-            <select
-              value={form.role}
-              onChange={(e) => setForm({ ...form, role: e.target.value })}
-              className="field-shell w-full"
-            >
-              <option value="USER">User</option>
-              <option value="ADMIN">Admin</option>
-            </select>
+            <div className="rounded-[24px] border border-white/10 bg-white/5 px-4 py-4 text-sm text-slate-300">
+              New accounts are created as standard renter accounts. Admin access is managed separately.
+            </div>
           </div>
 
           <button
@@ -95,7 +89,7 @@ export default function Register() {
             </h1>
           </div>
           <p className="max-w-sm text-base leading-7 text-slate-200/80">
-            Join as a renter or admin and start publishing products with a cleaner onboarding flow.
+            Join as a renter and start publishing products with a cleaner onboarding flow.
           </p>
         </div>
       </motion.div>

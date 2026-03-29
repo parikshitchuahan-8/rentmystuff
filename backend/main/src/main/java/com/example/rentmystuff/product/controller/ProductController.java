@@ -30,7 +30,7 @@ public class ProductController {
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ProductResponse addProduct(
-            @ModelAttribute ProductRequest request,
+            @Valid @ModelAttribute ProductRequest request,
             Principal principal
     ) {
         var user = userRepository.findByEmail(principal.getName())
@@ -64,10 +64,10 @@ public class ProductController {
                 .build();
     }
 
-    @PutMapping("/{id}")
+    @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ApiResponse<ProductResponse> updateProduct(
             @PathVariable UUID id,
-            @Valid @RequestBody ProductRequest request,
+            @Valid @ModelAttribute ProductRequest request,
             Principal principal
     ) {
         ProductResponse response =

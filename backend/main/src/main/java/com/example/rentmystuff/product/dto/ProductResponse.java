@@ -11,6 +11,7 @@ public class ProductResponse {
     private UUID id;
     private String title;
     private String description;
+    private String category;
     private Double pricePerDay;
     private String imageUrl;
     private Boolean available;

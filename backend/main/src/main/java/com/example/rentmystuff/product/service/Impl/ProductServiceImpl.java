@@ -1,5 +1,6 @@
 package com.example.rentmystuff.product.service.Impl;
 
+import com.example.rentmystuff.booking.repository.BookingRepository;
 import com.example.rentmystuff.exception.ResourceNotFoundException;
 import com.example.rentmystuff.product.dto.ProductRequest;
 import com.example.rentmystuff.product.dto.ProductResponse;
@@ -33,6 +34,7 @@ public class ProductServiceImpl implements ProductService {
 
     private final ProductRepository productRepository;
     private final UserRepository userRepository;
+    private final BookingRepository bookingRepository;
     private static final Logger logger =
             LoggerFactory.getLogger(ProductServiceImpl.class);
 
@@ -50,27 +52,7 @@ public class ProductServiceImpl implements ProductService {
 
         Product product = ProductMapper.toEntity(request);
         product.setOwner(owner);
-
-        String imagePath = null;
-
-        if (request.getImage() != null && !request.getImage().isEmpty()) {
-
-            try {
-                String uploadDir = "uploads/";
-                String fileName = UUID.randomUUID() + "_" + request.getImage().getOriginalFilename();
-
-                Path filePath = Paths.get(uploadDir, fileName);
-                Files.createDirectories(filePath.getParent());
-
-                Files.write(filePath, request.getImage().getBytes());
-
-                imagePath = filePath.toString();
-
-            } catch (IOException e) {
-                throw new RuntimeException("Failed to store image");
-            }
-        }
-        product.setImageUrl(imagePath);
+        product.setImageUrl(storeImage(request));
 
 
         Product savedProduct = productRepository.save(product);
@@ -116,6 +98,10 @@ public class ProductServiceImpl implements ProductService {
                     userEmail, productId);
 
             throw new RuntimeException("You are not allowed to delete this product");
+        }
+
+        if (bookingRepository.existsByProductId(productId)) {
+            throw new RuntimeException("This product has booking history and cannot be deleted");
         }
 
         productRepository.delete(product);
@@ -226,9 +212,33 @@ public class ProductServiceImpl implements ProductService {
         product.setPricePerDay(request.getPricePerDay());
         product.setCategory(request.getCategory());
 
+        String imagePath = storeImage(request);
+        if (imagePath != null) {
+            product.setImageUrl(imagePath);
+        }
+
         Product updated = productRepository.save(product);
 
         return ProductMapper.toResponse(updated);
+    }
+
+    private String storeImage(ProductRequest request) {
+        if (request.getImage() == null || request.getImage().isEmpty()) {
+            return null;
+        }
+
+        try {
+            String uploadDir = "uploads/";
+            String fileName = UUID.randomUUID() + "_" + request.getImage().getOriginalFilename();
+            Path filePath = Paths.get(uploadDir, fileName);
+
+            Files.createDirectories(filePath.getParent());
+            Files.write(filePath, request.getImage().getBytes());
+
+            return filePath.toString();
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to store image");
+        }
     }
 
 

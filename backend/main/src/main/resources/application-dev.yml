@@ -1,12 +1,12 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/rentmyapp
-    username: postgres
-    password: Parikshit@12
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/rentmyapp}
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:postgres}
   jpa:
     hibernate:
       ddl-auto: update
     show-sql: true
 jwt:
-  secret: cmVudG15c3R1ZmZzdXBlcnNlY3VyZWp3dHNlY3JldGtleXJlbnRteXN0dWZmc3VwZXJzZWN1cmVqd3RzZWNyZXQ=
-  expiration: 86400000
+  secret: ${JWT_SECRET:cmVudG15c3R1ZmYtZGV2LXNlY3JldC1yb3RhdGUtbWUtbG9jYWxseS1iZWZvcmUtcHJvZA==}
+  expiration: ${JWT_EXPIRATION:86400000}

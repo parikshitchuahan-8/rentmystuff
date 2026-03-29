@@ -1,6 +1,6 @@
 import { useParams } from "react-router-dom";
 import { useEffect, useState, useContext } from "react";
-import api from "../api/axios";
+import api, { getErrorMessage } from "../api/axios";
 import toast from "react-hot-toast";
 import { motion } from "framer-motion";
 import { AuthContext } from "../context/AuthContext";
@@ -91,8 +91,7 @@ export default function ProductDetails() {
       setTotalPrice(0);
       fetchUnavailableDates();
     } catch (err) {
-      const message = err.response?.data || "Booking failed!";
-      toast.error(message);
+      toast.error(getErrorMessage(err, "Booking failed!"));
     }
   };
 

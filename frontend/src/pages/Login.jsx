@@ -1,5 +1,5 @@
 import { useState, useContext } from "react";
-import api from "../api/axios";
+import api, { getErrorMessage } from "../api/axios";
 import { useNavigate, Link } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import { motion } from "framer-motion";
@@ -24,7 +24,7 @@ export default function Login() {
       toast.success("Welcome back!");
       navigate("/");
     } catch (error) {
-      toast.error("Login failed");
+      toast.error(getErrorMessage(error, "Login failed"));
     }
   };
 

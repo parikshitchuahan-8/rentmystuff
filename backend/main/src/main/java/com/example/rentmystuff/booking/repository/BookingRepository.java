@@ -13,6 +13,8 @@ public interface BookingRepository extends JpaRepository<Booking, UUID> {
 
     List<Booking> findByRenterId(UUID renterId);
 
+    boolean existsByProductId(UUID productId);
+
 
     @Query("""
 SELECT CASE WHEN COUNT(b) > 0 THEN true ELSE false END

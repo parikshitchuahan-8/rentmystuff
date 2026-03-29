@@ -1,5 +1,5 @@
 import { useEffect, useState, useContext } from "react";
-import api from "../api/axios";
+import api, { getErrorMessage } from "../api/axios";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { FiArrowRight, FiRefreshCw, FiSearch, FiSliders } from "react-icons/fi";
@@ -18,12 +18,20 @@ export default function Home() {
   });
 
   const deleteProduct = async (id) => {
+    const confirmed = window.confirm(
+      "Delete this product? Listings with booking history cannot be deleted."
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
     try {
       await api.delete(`/products/${id}`);
       toast.success("Product deleted");
       fetchProducts();
     } catch (err) {
-      toast.error("Delete failed");
+      toast.error(getErrorMessage(err, "Delete failed"));
     }
   };
 
@@ -101,7 +109,7 @@ export default function Home() {
             <div className="rounded-[28px] border border-emerald-300/20 bg-emerald-300/10 p-5">
               <p className="text-sm uppercase tracking-[0.24em] text-emerald-200/80">Owner Friendly</p>
               <p className="mt-3 text-3xl font-black text-emerald-100">Approve</p>
-              <p className="mt-2 text-sm text-emerald-100/80">Stay in control of every request.</p>
+              <p className="mt-2 text-sm text-emerald-100/80">Search by category, price, and product type with less guesswork.</p>
             </div>
           </div>
         </div>
@@ -225,6 +233,9 @@ export default function Home() {
                 </div>
 
                 <p className="muted-copy line-clamp-3 text-sm leading-6">{product.description}</p>
+                {product.ownerEmail && (
+                  <p className="text-sm text-slate-400">Listed by {product.ownerEmail}</p>
+                )}
 
                 {product.ownerId === user?.id && (
                   <button

@@ -40,6 +40,14 @@ export default function ProductDetails() {
     fetchUnavailableDates();
   }, []);
 
+  const hasUnavailableOverlap = unavailable.some(({ startDate, endDate }) => {
+    if (!bookingData.startDate || !bookingData.endDate) {
+      return false;
+    }
+
+    return bookingData.startDate <= endDate && bookingData.endDate >= startDate;
+  });
+
   const fetchProduct = async () => {
     try {
       const res = await api.get(`/products/${id}`);
@@ -65,6 +73,11 @@ export default function ProductDetails() {
       return;
     }
 
+    if (hasUnavailableOverlap) {
+      toast.error("Those dates overlap with an existing booking");
+      return;
+    }
+
     try {
       await api.post("/bookings", {
         productId: id,
@@ -76,6 +89,7 @@ export default function ProductDetails() {
       setBookingData({ startDate: "", endDate: "" });
       setTotalDays(0);
       setTotalPrice(0);
+      fetchUnavailableDates();
     } catch (err) {
       const message = err.response?.data || "Booking failed!";
       toast.error(message);
@@ -166,6 +180,9 @@ export default function ProductDetails() {
               <div className="mt-3 space-y-2">
                 <p>Rs {product.pricePerDay} x {totalDays} days</p>
                 <p className="text-xl font-bold text-teal-300">Total: Rs {totalPrice}</p>
+                {hasUnavailableOverlap && (
+                  <p className="text-sm text-rose-200">Selected dates overlap with an existing booking.</p>
+                )}
               </div>
             ) : (
               <p className="mt-3">Select a valid date range to see the total.</p>
@@ -174,9 +191,9 @@ export default function ProductDetails() {
 
           <button
             onClick={handleBooking}
-            disabled={totalDays <= 0 || !product.available || isOwner}
+            disabled={totalDays <= 0 || !product.available || isOwner || hasUnavailableOverlap}
             className={`w-full rounded-2xl py-3 font-semibold transition-all duration-300 ${
-              totalDays > 0 && product.available && !isOwner
+              totalDays > 0 && product.available && !isOwner && !hasUnavailableOverlap
                 ? "cta-primary text-slate-950"
                 : "cursor-not-allowed bg-slate-700 text-slate-300"
             }`}

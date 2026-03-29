@@ -4,6 +4,7 @@ import com.example.rentmystuff.booking.dto.BookingRequest;
 import com.example.rentmystuff.booking.dto.BookingResponse;
 import com.example.rentmystuff.booking.service.BookingService;
 import com.example.rentmystuff.user.repository.UserRepository;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,7 +22,7 @@ public class BookingController {
 
     @PostMapping
     public BookingResponse bookProduct(
-            @RequestBody BookingRequest request,
+            @Valid @RequestBody BookingRequest request,
             Principal principal
     ) {
         var user = userRepository.findByEmail(principal.getName())

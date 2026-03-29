@@ -1,13 +1,11 @@
-import { useEffect, useState, useContext } from "react";
+import { useEffect, useState } from "react";
 import api from "../api/axios";
-import { AuthContext } from "../context/AuthContext";
 import { motion } from "framer-motion";
 import toast from "react-hot-toast";
 
 export default function MyBookings() {
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
-  const { user } = useContext(AuthContext);
 
   useEffect(() => {
     fetchBookings();
@@ -33,26 +31,6 @@ export default function MyBookings() {
       fetchBookings();
     } catch (err) {
       toast.error("Cancel failed");
-    }
-  };
-
-  const approveBooking = async (id) => {
-    try {
-      await api.put(`/bookings/${id}/approve`);
-      toast.success("Booking approved");
-      fetchBookings();
-    } catch (err) {
-      toast.error("Approval failed");
-    }
-  };
-
-  const rejectBooking = async (id) => {
-    try {
-      await api.put(`/bookings/${id}/reject`);
-      toast.success("Booking rejected");
-      fetchBookings();
-    } catch (err) {
-      toast.error("Reject failed");
     }
   };
 
@@ -119,25 +97,7 @@ export default function MyBookings() {
               </div>
 
               <div className="flex flex-wrap gap-3 lg:justify-end">
-                {booking.status === "PENDING" && booking.ownerId === user?.id && (
-                  <>
-                    <button
-                      onClick={() => approveBooking(booking.id)}
-                      className="rounded-2xl border border-emerald-400/20 bg-emerald-400/10 px-4 py-2.5 text-sm font-medium text-emerald-200 transition-all duration-300 hover:bg-emerald-400/20"
-                    >
-                      Approve
-                    </button>
-
-                    <button
-                      onClick={() => rejectBooking(booking.id)}
-                      className="rounded-2xl border border-rose-400/20 bg-rose-400/10 px-4 py-2.5 text-sm font-medium text-rose-200 transition-all duration-300 hover:bg-rose-400/20"
-                    >
-                      Reject
-                    </button>
-                  </>
-                )}
-
-                {booking.status !== "REJECTED" && (
+                {(booking.status === "PENDING" || booking.status === "APPROVED") && (
                   <button
                     onClick={() => cancelBooking(booking.id)}
                     className="rounded-2xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm font-medium text-slate-200 transition-all duration-300 hover:bg-white/10"

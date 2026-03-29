@@ -18,6 +18,7 @@ public interface BookingRepository extends JpaRepository<Booking, UUID> {
 SELECT CASE WHEN COUNT(b) > 0 THEN true ELSE false END
 FROM Booking b
 WHERE b.product.id = :productId
+AND b.status IN ('PENDING', 'APPROVED')
 AND b.startDate <= :endDate
 AND b.endDate >= :startDate
 """)
@@ -27,12 +28,12 @@ AND b.endDate >= :startDate
             LocalDate endDate
     );
 
-    List<Booking> findByProductId(UUID productId);
+    List<Booking> findByProductIdAndStatusIn(UUID productId, List<com.example.rentmystuff.booking.entity.BookingStatus> statuses);
 
     @Query("""
     SELECT b FROM Booking b
     WHERE b.product.id = :productId
-    AND b.status <> 'CANCELLED'
+    AND b.status IN ('PENDING', 'APPROVED')
     AND (
         (:startDate BETWEEN b.startDate AND b.endDate)
         OR

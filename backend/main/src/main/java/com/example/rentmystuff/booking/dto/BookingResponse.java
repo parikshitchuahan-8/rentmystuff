@@ -13,7 +13,9 @@ public class BookingResponse {
     private UUID productId;
     private String productTitle;
     private String imageUrl;
+    private UUID ownerId;
     private UUID renterId;
+    private String renterEmail;
     private LocalDate startDate;
     private LocalDate endDate;
     private Double totalPrice;

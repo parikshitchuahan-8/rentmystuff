@@ -9,12 +9,12 @@ import com.example.rentmystuff.booking.mapper.BookingMapper;
 import com.example.rentmystuff.booking.repository.BookingRepository;
 import com.example.rentmystuff.booking.service.BookingService;
 import com.example.rentmystuff.exception.ResourceNotFoundException;
-import com.example.rentmystuff.product.entity.Product;
 import com.example.rentmystuff.product.repository.ProductRepository;
 import com.example.rentmystuff.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.UUID;
@@ -29,6 +29,7 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public BookingResponse bookProduct(BookingRequest request, UUID renterId) {
+        validateBookingDates(request.getStartDate(), request.getEndDate());
 
         boolean exists = bookingRepository.existsByProductIdAndDateOverlap(
                 request.getProductId(),
@@ -47,9 +48,10 @@ public class BookingServiceImpl implements BookingService {
         var renter = userRepository.findById(renterId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        if(product.getOwner().getId().equals(renter.getId())){
-            throw new RuntimeException("you cannot rent your own product");
+        if (product.getOwner().getId().equals(renter.getId())) {
+            throw new RuntimeException("You cannot rent your own product");
         }
+
         if (!product.getAvailable()) {
             throw new RuntimeException("Product not available");
         }
@@ -85,17 +87,8 @@ public class BookingServiceImpl implements BookingService {
 
 
         bookingRepository.save(booking);
-        productRepository.save(product);
 
-        return BookingResponse.builder()
-                .id(booking.getId())
-                .productId(product.getId())
-                .renterId(renter.getId())
-                .startDate(booking.getStartDate())
-                .endDate(booking.getEndDate())
-                .totalPrice(booking.getTotalPrice())
-                .status(booking.getStatus().name())
-                .build();
+        return BookingMapper.toResponse(booking);
     }
 
     @Override
@@ -119,17 +112,16 @@ public class BookingServiceImpl implements BookingService {
             throw new RuntimeException("You are not allowed to cancel this booking");
         }
 
-        Product product = booking.getProduct();
-        product.setAvailable(true);
-
         bookingRepository.delete(booking);
-        productRepository.save(product);
     }
 
     @Override
     public List<UnavailableDateResponse> getUnavailableDates(UUID productId) {
 
-        return bookingRepository.findByProductId(productId)
+        return bookingRepository.findByProductIdAndStatusIn(
+                        productId,
+                        List.of(BookingStatus.PENDING, BookingStatus.APPROVED)
+                )
                 .stream()
                 .map(booking ->
                         new UnavailableDateResponse(
@@ -146,9 +138,12 @@ public class BookingServiceImpl implements BookingService {
         var booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new RuntimeException("Booking not found"));
 
-        // OWNER CHECK
         if (!booking.getProduct().getOwner().getEmail().equals(ownerEmail)) {
             throw new RuntimeException("You are not allowed to approve this booking");
+        }
+
+        if (booking.getStatus() != BookingStatus.PENDING) {
+            throw new RuntimeException("Only pending bookings can be approved");
         }
 
         booking.setStatus(BookingStatus.APPROVED);
@@ -161,9 +156,12 @@ public class BookingServiceImpl implements BookingService {
         var booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new RuntimeException("Booking not found"));
 
-        // OWNER CHECK
         if (!booking.getProduct().getOwner().getEmail().equals(ownerEmail)) {
             throw new RuntimeException("You are not allowed to reject this booking");
+        }
+
+        if (booking.getStatus() != BookingStatus.PENDING) {
+            throw new RuntimeException("Only pending bookings can be rejected");
         }
 
         booking.setStatus(BookingStatus.REJECTED);
@@ -179,5 +177,13 @@ public class BookingServiceImpl implements BookingService {
                 .toList();
     }
 
+    private void validateBookingDates(LocalDate startDate, LocalDate endDate) {
+        if (startDate == null || endDate == null) {
+            throw new RuntimeException("Start date and end date are required");
+        }
 
+        if (!startDate.isBefore(endDate)) {
+            throw new RuntimeException("End date must be after start date");
+        }
+    }
 }

@@ -26,76 +26,79 @@ export default function Register() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center">
-
-      <motion.form
-        onSubmit={handleSubmit}
-        initial={{ opacity: 0, y: 40 }}
+    <div className="flex min-h-[calc(100vh-10rem)] items-center justify-center py-8">
+      <motion.div
+        initial={{ opacity: 0, y: 36 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-        className="backdrop-blur-xl bg-white/5 border border-white/10 rounded-3xl p-10 w-full max-w-md shadow-2xl"
+        transition={{ duration: 0.55 }}
+        className="glass-panel grid w-full max-w-5xl overflow-hidden rounded-[34px] lg:grid-cols-[0.95fr_1.05fr]"
       >
-        <h2 className="text-3xl font-bold mb-8 bg-gradient-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent text-center">
-          Create Account
-        </h2>
+        <motion.form onSubmit={handleSubmit} className="space-y-6 p-8 sm:p-10">
+          <div>
+            <p className="section-kicker">Join In</p>
+            <h2 className="mt-3 text-3xl font-black text-white">Create your account</h2>
+            <p className="muted-copy mt-3 text-sm leading-6">Start renting, listing, and managing bookings from one place.</p>
+          </div>
 
-        <div className="space-y-5">
+          <div className="space-y-4">
+            <input
+              type="text"
+              placeholder="Full name"
+              className="field-shell w-full"
+              onChange={(e) => setForm({ ...form, name: e.target.value })}
+            />
 
-          <input
-            type="text"
-            placeholder="Full Name"
-            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 focus:ring-2 focus:ring-cyan-400 outline-none transition"
-            onChange={(e) =>
-              setForm({ ...form, name: e.target.value })
-            }
-          />
+            <input
+              type="email"
+              placeholder="Email address"
+              className="field-shell w-full"
+              onChange={(e) => setForm({ ...form, email: e.target.value })}
+            />
 
-          <input
-            type="email"
-            placeholder="Email Address"
-            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 focus:ring-2 focus:ring-cyan-400 outline-none transition"
-            onChange={(e) =>
-              setForm({ ...form, email: e.target.value })
-            }
-          />
+            <input
+              type="password"
+              placeholder="Password"
+              className="field-shell w-full"
+              onChange={(e) => setForm({ ...form, password: e.target.value })}
+            />
 
-          <input
-            type="password"
-            placeholder="Password"
-            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 focus:ring-2 focus:ring-cyan-400 outline-none transition"
-            onChange={(e) =>
-              setForm({ ...form, password: e.target.value })
-            }
-          />
-
-          <select
-            value={form.role}
-            onChange={(e) =>
-              setForm({ ...form, role: e.target.value })
-            }
-            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 focus:ring-2 focus:ring-cyan-400 outline-none transition"
-          >
-            <option value="USER">User</option>
-            <option value="ADMIN">Admin</option>
-          </select>
+            <select
+              value={form.role}
+              onChange={(e) => setForm({ ...form, role: e.target.value })}
+              className="field-shell w-full"
+            >
+              <option value="USER">User</option>
+              <option value="ADMIN">Admin</option>
+            </select>
+          </div>
 
           <button
             type="submit"
-            className="w-full py-3 rounded-xl font-medium bg-gradient-to-r from-indigo-500 to-cyan-500 hover:scale-105 transition-all duration-300 shadow-lg"
+            className="cta-primary w-full rounded-2xl py-3 font-semibold text-slate-950 transition-all duration-300"
           >
             Register
           </button>
 
-          <p className="text-sm text-gray-400 text-center">
-            Already have an account?{" "}
-            <Link to="/login" className="text-cyan-400 hover:underline">
+          <p className="text-center text-sm text-slate-300">
+            Already have an account? {" "}
+            <Link to="/login" className="font-semibold text-amber-200 hover:text-white">
               Login
             </Link>
           </p>
+        </motion.form>
 
+        <div className="hidden bg-gradient-to-br from-teal-300/20 via-cyan-300/10 to-amber-200/20 p-10 lg:flex lg:flex-col lg:justify-between">
+          <div>
+            <p className="section-kicker">Build Your Shelf</p>
+            <h1 className="mt-4 text-5xl font-black leading-tight text-white">
+              Turn idle stuff into active rentals.
+            </h1>
+          </div>
+          <p className="max-w-sm text-base leading-7 text-slate-200/80">
+            Join as a renter or admin and start publishing products with a cleaner onboarding flow.
+          </p>
         </div>
-      </motion.form>
-
+      </motion.div>
     </div>
   );
 }

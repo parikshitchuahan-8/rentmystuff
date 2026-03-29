@@ -2,17 +2,17 @@ import { Link, useLocation } from "react-router-dom";
 import { useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
 import { motion } from "framer-motion";
-import { FiLogOut, FiPlusCircle } from "react-icons/fi";
+import { FiHome, FiLogOut, FiPlusCircle } from "react-icons/fi";
 
 export default function Navbar() {
   const { user, logout } = useContext(AuthContext);
   const location = useLocation();
 
   const navLinkStyle = (path) =>
-    `relative px-3 py-2 transition-all duration-300 ${
+    `rounded-full px-4 py-2 text-sm font-medium transition-all duration-300 ${
       location.pathname === path
-        ? "text-cyan-400"
-        : "text-gray-300 hover:text-white"
+        ? "bg-white/10 text-white shadow-lg shadow-black/10"
+        : "text-slate-300 hover:bg-white/5 hover:text-white"
     }`;
 
   return (
@@ -20,21 +20,32 @@ export default function Navbar() {
       initial={{ y: -60, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.6 }}
-      className="fixed top-0 left-0 w-full z-50 backdrop-blur-xl bg-white/5 border-b border-white/10 shadow-lg"
+      className="fixed left-0 top-0 z-50 w-full"
     >
-      <div className="max-w-7xl mx-auto px-8 py-4 flex justify-between items-center">
-
-        {/* Logo */}
+      <div className="mx-auto max-w-7xl px-4 py-4 sm:px-6 lg:px-8">
+        <div className="glass-panel flex flex-col gap-4 rounded-[28px] px-5 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
         <Link
           to="/"
-          className="text-2xl font-bold bg-gradient-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent tracking-wide"
+          className="flex items-center gap-3"
         >
-          RentMyStuff
+          <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-amber-300 via-orange-400 to-teal-400 text-base font-black text-slate-950">
+            RM
+          </span>
+          <span>
+            <span className="block text-xs uppercase tracking-[0.3em] text-amber-200/80">
+              Rental Marketplace
+            </span>
+            <span className="hero-title block text-2xl font-black tracking-[0.08em]">
+              RentMyStuff
+            </span>
+          </span>
         </Link>
 
-        {/* Right Section */}
-        <div className="flex items-center gap-6">
-
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+          <Link className={`${navLinkStyle("/")} inline-flex items-center gap-2`} to="/">
+            <FiHome />
+            Explore
+          </Link>
           {!user ? (
             <>
               <Link className={navLinkStyle("/login")} to="/login">
@@ -43,7 +54,7 @@ export default function Navbar() {
 
               <Link
                 to="/register"
-                className="px-5 py-2 rounded-xl bg-gradient-to-r from-indigo-500 to-cyan-500 text-white font-medium hover:scale-105 transition-all duration-300 shadow-md"
+                className="cta-primary rounded-full px-5 py-2 text-sm font-semibold text-slate-950 transition-all duration-300"
               >
                 Register
               </Link>
@@ -59,28 +70,26 @@ export default function Navbar() {
 
               <Link
                 to="/owner-dashboard"
-                className="px-4 py-2 rounded-xl bg-purple-600/80 hover:bg-purple-600 transition-all duration-300 text-white shadow-md hover:scale-105"
+                className={navLinkStyle("/owner-dashboard")}
               >
                 Owner Dashboard
               </Link>
 
               <Link
                 to="/add-product"
-                className="flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-indigo-500 to-cyan-500 text-white shadow-md hover:scale-105 transition-all duration-300"
+                className="cta-primary flex items-center justify-center gap-2 rounded-full px-5 py-2 text-sm font-semibold text-slate-950 transition-all duration-300"
               >
                 <FiPlusCircle />
                 Add Product
               </Link>
 
-              {/* User Name */}
-              <div className="px-3 py-1 rounded-xl bg-white/5 border border-white/10 text-gray-300 text-sm">
+              <div className="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm text-slate-200">
                 {user.name}
               </div>
 
-              {/* Logout */}
               <button
                 onClick={logout}
-                className="flex items-center gap-2 text-red-400 hover:text-red-500 transition-all duration-300"
+                className="flex items-center gap-2 rounded-full px-4 py-2 text-sm text-rose-300 transition-all duration-300 hover:bg-rose-500/10 hover:text-rose-200"
               >
                 <FiLogOut />
                 Logout
@@ -88,6 +97,7 @@ export default function Navbar() {
             </>
           )}
         </div>
+      </div>
       </div>
     </motion.nav>
   );

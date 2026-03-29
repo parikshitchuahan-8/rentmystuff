@@ -4,7 +4,6 @@ import toast from "react-hot-toast";
 import { motion } from "framer-motion";
 
 export default function OwnerDashboard() {
-
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -45,152 +44,117 @@ export default function OwnerDashboard() {
     }
   };
 
-  const pending = bookings.filter(b => b.status === "PENDING").length;
-  const approved = bookings.filter(b => b.status === "APPROVED").length;
-  const rejected = bookings.filter(b => b.status === "REJECTED").length;
+  const pending = bookings.filter((b) => b.status === "PENDING").length;
+  const approved = bookings.filter((b) => b.status === "APPROVED").length;
+  const rejected = bookings.filter((b) => b.status === "REJECTED").length;
 
   return (
-    <div className="max-w-7xl mx-auto text-white space-y-10">
-
-      {/* HEADER */}
-
-      <motion.h1
-        initial={{ opacity: 0, y: 30 }}
+    <div className="space-y-8">
+      <motion.section
+        initial={{ opacity: 0, y: 24 }}
         animate={{ opacity: 1, y: 0 }}
-        className="text-4xl font-bold bg-gradient-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent"
+        className="glass-panel rounded-[34px] px-6 py-8 sm:px-8"
       >
-        Owner Dashboard
-      </motion.h1>
+        <div className="grid gap-6 lg:grid-cols-[1.15fr_0.85fr] lg:items-end">
+          <div>
+            <p className="section-kicker">Owner Control</p>
+            <h1 className="hero-title mt-3 text-4xl font-black sm:text-5xl">Manage incoming requests with confidence</h1>
+            <p className="muted-copy mt-4 max-w-2xl text-base leading-7">
+              Keep the queue tidy, approve fast, and spot stalled rental requests before they stack up.
+            </p>
+          </div>
 
-      {/* STATS */}
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+            <StatCard title="Pending" value={pending} tone="amber" />
+            <StatCard title="Approved" value={approved} tone="teal" />
+            <StatCard title="Rejected" value={rejected} tone="rose" />
+          </div>
+        </div>
+      </motion.section>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-
-        <StatCard title="Pending Requests" value={pending} color="yellow" />
-        <StatCard title="Approved Bookings" value={approved} color="green" />
-        <StatCard title="Rejected Requests" value={rejected} color="red" />
-
-      </div>
-
-      {/* LOADING */}
-
-      {loading && (
-        <div className="text-gray-400">Loading bookings...</div>
-      )}
-
-      {/* EMPTY */}
+      {loading && <div className="glass-panel rounded-[30px] p-8 text-slate-300">Loading bookings...</div>}
 
       {!loading && bookings.length === 0 && (
-        <div className="text-gray-400">
-          No booking requests yet.
-        </div>
+        <div className="glass-panel rounded-[30px] p-8 text-slate-300">No booking requests yet.</div>
       )}
 
-      {/* BOOKINGS */}
+      {!loading && bookings.length > 0 && (
+        <div className="grid gap-6">
+          {bookings.map((booking, index) => (
+            <motion.article
+              key={booking.id}
+              initial={{ opacity: 0, y: 36 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.05 }}
+              className="glass-panel grid gap-5 rounded-[30px] p-5 sm:p-6 lg:grid-cols-[1fr_auto] lg:items-center"
+            >
+              <div className="space-y-3">
+                <div className="flex flex-wrap items-center gap-3">
+                  <h2 className="text-2xl font-bold text-white">{booking.productTitle}</h2>
+                  <StatusBadge status={booking.status} />
+                </div>
 
-      <div className="space-y-6">
-
-        {bookings.map((b, index) => (
-
-          <motion.div
-            key={b.id}
-            initial={{ opacity: 0, y: 40 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: index * 0.05 }}
-            className="backdrop-blur-xl bg-white/5 border border-white/10 rounded-3xl p-8 shadow-xl flex flex-col md:flex-row md:items-center md:justify-between gap-6"
-          >
-
-            {/* LEFT */}
-
-            <div className="space-y-2">
-
-              <h2 className="text-xl font-semibold">
-                {b.productTitle}
-              </h2>
-
-              <p className="text-gray-400 text-sm">
-                {b.startDate} → {b.endDate}
-              </p>
-
-              <p className="text-cyan-400 font-semibold">
-                ₹{b.totalPrice}
-              </p>
-
-              {b.renterEmail && (
-                <p className="text-xs text-gray-400">
-                  Renter: {b.renterEmail}
-                </p>
-              )}
-
-              <StatusBadge status={b.status} />
-
-            </div>
-
-            {/* ACTIONS */}
-
-            {b.status === "PENDING" && (
-              <div className="flex gap-4">
-
-                <button
-                  onClick={() => approveBooking(b.id)}
-                  className="px-5 py-2 rounded-xl bg-green-500/20 text-green-400 hover:bg-green-500 hover:text-white transition-all duration-300"
-                >
-                  Approve
-                </button>
-
-                <button
-                  onClick={() => rejectBooking(b.id)}
-                  className="px-5 py-2 rounded-xl bg-red-500/20 text-red-400 hover:bg-red-500 hover:text-white transition-all duration-300"
-                >
-                  Reject
-                </button>
-
+                <div className="flex flex-wrap gap-3 text-sm text-slate-300">
+                  <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5">
+                    {booking.startDate} to {booking.endDate}
+                  </span>
+                  <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-teal-300">
+                    Rs {booking.totalPrice}
+                  </span>
+                  {booking.renterEmail && (
+                    <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5">
+                      {booking.renterEmail}
+                    </span>
+                  )}
+                </div>
               </div>
-            )}
 
-          </motion.div>
+              {booking.status === "PENDING" && (
+                <div className="flex flex-wrap gap-3 lg:justify-end">
+                  <button
+                    onClick={() => approveBooking(booking.id)}
+                    className="rounded-2xl border border-emerald-400/20 bg-emerald-400/10 px-5 py-2.5 text-sm font-medium text-emerald-200 transition-all duration-300 hover:bg-emerald-400/20"
+                  >
+                    Approve
+                  </button>
 
-        ))}
-
-      </div>
-
+                  <button
+                    onClick={() => rejectBooking(booking.id)}
+                    className="rounded-2xl border border-rose-400/20 bg-rose-400/10 px-5 py-2.5 text-sm font-medium text-rose-200 transition-all duration-300 hover:bg-rose-400/20"
+                  >
+                    Reject
+                  </button>
+                </div>
+              )}
+            </motion.article>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
 
-/* STAT CARD */
-
-function StatCard({ title, value, color }) {
-
-  const colorMap = {
-    yellow: "text-yellow-400",
-    green: "text-green-400",
-    red: "text-red-400",
+function StatCard({ title, value, tone }) {
+  const toneMap = {
+    amber: "text-amber-200 border-amber-300/20 bg-amber-300/10",
+    teal: "text-teal-200 border-teal-300/20 bg-teal-300/10",
+    rose: "text-rose-200 border-rose-300/20 bg-rose-300/10",
   };
 
   return (
-    <div className="backdrop-blur-xl bg-white/5 border border-white/10 rounded-3xl p-8 shadow-xl">
-      <p className="text-gray-400 text-sm">{title}</p>
-      <h2 className={`text-3xl font-bold mt-2 ${colorMap[color]}`}>
-        {value}
-      </h2>
+    <div className={`rounded-[26px] border p-5 ${toneMap[tone]}`}>
+      <p className="text-sm uppercase tracking-[0.22em]">{title}</p>
+      <p className="mt-3 text-3xl font-black">{value}</p>
     </div>
   );
 }
-
-/* STATUS BADGE */
 
 function StatusBadge({ status }) {
-
   const styles = {
-    PENDING: "bg-yellow-500/20 text-yellow-400",
-    APPROVED: "bg-green-500/20 text-green-400",
-    REJECTED: "bg-red-500/20 text-red-400",
+    PENDING: "bg-amber-400/15 text-amber-200",
+    APPROVED: "bg-emerald-400/15 text-emerald-200",
+    REJECTED: "bg-rose-400/15 text-rose-200",
   };
 
-  return (
-    <span className={`px-3 py-1 rounded-full text-xs font-medium ${styles[status]}`}>
-      {status}
-    </span>
-  );
+  return <span className={`rounded-full px-3 py-1 text-xs font-semibold ${styles[status]}`}>{status}</span>;
 }

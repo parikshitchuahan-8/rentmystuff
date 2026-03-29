@@ -6,6 +6,7 @@ import toast from "react-hot-toast";
 
 export default function MyBookings() {
   const [bookings, setBookings] = useState([]);
+  const [loading, setLoading] = useState(true);
   const { user } = useContext(AuthContext);
 
   useEffect(() => {
@@ -14,11 +15,14 @@ export default function MyBookings() {
 
   const fetchBookings = async () => {
     try {
+      setLoading(true);
       const res = await api.get("/bookings/my");
       setBookings(res.data);
     } catch (err) {
       console.error(err);
       toast.error("Failed to load bookings");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -35,129 +39,141 @@ export default function MyBookings() {
   const approveBooking = async (id) => {
     try {
       await api.put(`/bookings/${id}/approve`);
+      toast.success("Booking approved");
       fetchBookings();
     } catch (err) {
-      console.error(err);
+      toast.error("Approval failed");
     }
   };
 
   const rejectBooking = async (id) => {
     try {
       await api.put(`/bookings/${id}/reject`);
+      toast.success("Booking rejected");
       fetchBookings();
     } catch (err) {
-      console.error(err);
+      toast.error("Reject failed");
     }
   };
 
+  const pendingCount = bookings.filter((booking) => booking.status === "PENDING").length;
+  const approvedCount = bookings.filter((booking) => booking.status === "APPROVED").length;
+
   return (
-    <div className="max-w-7xl mx-auto text-white space-y-10">
-
-      {/* HEADER */}
-      <motion.h1
-        initial={{ opacity: 0, y: 30 }}
+    <div className="space-y-8">
+      <motion.section
+        initial={{ opacity: 0, y: 24 }}
         animate={{ opacity: 1, y: 0 }}
-        className="text-4xl font-bold bg-gradient-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent"
+        className="glass-panel rounded-[34px] px-6 py-8 sm:px-8"
       >
-        My Bookings
-      </motion.h1>
+        <div className="grid gap-6 lg:grid-cols-[1.3fr_0.7fr] lg:items-end">
+          <div>
+            <p className="section-kicker">Bookings</p>
+            <h1 className="hero-title mt-3 text-4xl font-black sm:text-5xl">Track every rental in one place</h1>
+            <p className="muted-copy mt-4 max-w-2xl text-base leading-7">
+              Review upcoming dates, keep an eye on approvals, and manage any booking before it becomes a problem.
+            </p>
+          </div>
 
-      {/* EMPTY STATE */}
-      {bookings.length === 0 ? (
-        <div className="backdrop-blur-xl bg-white/5 border border-white/10 rounded-3xl p-8 text-gray-400">
-          You have no bookings yet.
+          <div className="grid grid-cols-2 gap-4">
+            <MetricCard label="Pending" value={pendingCount} tone="amber" />
+            <MetricCard label="Approved" value={approvedCount} tone="teal" />
+          </div>
         </div>
+      </motion.section>
+
+      {loading ? (
+        <div className="glass-panel rounded-[30px] p-8 text-slate-300">Loading your bookings...</div>
+      ) : bookings.length === 0 ? (
+        <div className="glass-panel rounded-[30px] p-8 text-slate-300">You have no bookings yet.</div>
       ) : (
-        <div className="space-y-6">
+        <div className="grid gap-6">
           {bookings.map((booking, index) => (
-            <motion.div
+            <motion.article
               key={booking.id}
-              initial={{ opacity: 0, y: 40 }}
+              initial={{ opacity: 0, y: 36 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.08 }}
-              className="backdrop-blur-xl bg-white/5 border border-white/10 rounded-3xl p-8 shadow-xl flex flex-col md:flex-row md:justify-between md:items-center gap-6"
+              transition={{ delay: index * 0.06 }}
+              className="glass-panel grid gap-6 rounded-[30px] p-5 sm:p-6 lg:grid-cols-[auto_1fr_auto] lg:items-center"
             >
+              <img
+                src={`http://localhost:8080/${booking.imageUrl}`}
+                alt={booking.productTitle}
+                className="h-24 w-full rounded-[22px] object-cover sm:w-28"
+              />
 
-              {/* LEFT INFO */}
               <div className="space-y-3">
+                <div className="flex flex-wrap items-center gap-3">
+                  <h2 className="text-2xl font-bold text-white">{booking.productTitle}</h2>
+                  <StatusBadge status={booking.status} />
+                </div>
 
-                  <img
-                  src={`http://localhost:8080/${booking.imageUrl}`}
-                                  className="w-24 h-24 rounded-xl object-cover"
-                                  />
-
-                <h2 className="text-xl font-semibold">
-                  {booking.productTitle}
-                </h2>
-
-
-                <p className="text-gray-400 text-sm">
-                  {booking.startDate} → {booking.endDate}
-                </p>
-
-                <p className="text-cyan-400 font-semibold text-lg">
-                  ₹{booking.totalPrice ?? 0}
-                </p>
-
-                <StatusBadge status={booking.status} />
-
+                <div className="flex flex-wrap gap-3 text-sm text-slate-300">
+                  <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5">
+                    {booking.startDate} to {booking.endDate}
+                  </span>
+                  <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-teal-300">
+                    Rs {booking.totalPrice ?? 0}
+                  </span>
+                </div>
               </div>
 
-              {/* ACTIONS */}
-              <div className="flex flex-wrap gap-4">
+              <div className="flex flex-wrap gap-3 lg:justify-end">
+                {booking.status === "PENDING" && booking.ownerId === user?.id && (
+                  <>
+                    <button
+                      onClick={() => approveBooking(booking.id)}
+                      className="rounded-2xl border border-emerald-400/20 bg-emerald-400/10 px-4 py-2.5 text-sm font-medium text-emerald-200 transition-all duration-300 hover:bg-emerald-400/20"
+                    >
+                      Approve
+                    </button>
 
-                {booking.status === "PENDING" &&
-                  booking.ownerId === user?.id && (
-                    <>
-                      <button
-                        onClick={() => approveBooking(booking.id)}
-                        className="px-4 py-2 rounded-xl bg-green-500/20 text-green-400 hover:bg-green-500 hover:text-white transition-all duration-300"
-                      >
-                        Approve
-                      </button>
-
-                      <button
-                        onClick={() => rejectBooking(booking.id)}
-                        className="px-4 py-2 rounded-xl bg-red-500/20 text-red-400 hover:bg-red-500 hover:text-white transition-all duration-300"
-                      >
-                        Reject
-                      </button>
-                    </>
-                  )}
+                    <button
+                      onClick={() => rejectBooking(booking.id)}
+                      className="rounded-2xl border border-rose-400/20 bg-rose-400/10 px-4 py-2.5 text-sm font-medium text-rose-200 transition-all duration-300 hover:bg-rose-400/20"
+                    >
+                      Reject
+                    </button>
+                  </>
+                )}
 
                 {booking.status !== "REJECTED" && (
                   <button
                     onClick={() => cancelBooking(booking.id)}
-                    className="px-4 py-2 rounded-xl bg-red-500/20 text-red-400 hover:bg-red-500 hover:text-white transition-all duration-300"
+                    className="rounded-2xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm font-medium text-slate-200 transition-all duration-300 hover:bg-white/10"
                   >
                     Cancel
                   </button>
                 )}
-
               </div>
-
-            </motion.div>
+            </motion.article>
           ))}
         </div>
       )}
-
     </div>
   );
 }
 
-/* STATUS BADGE COMPONENT */
-function StatusBadge({ status }) {
-  const styles = {
-    PENDING: "bg-yellow-500/20 text-yellow-400",
-    APPROVED: "bg-green-500/20 text-green-400",
-    REJECTED: "bg-red-500/20 text-red-400",
+function MetricCard({ label, value, tone }) {
+  const toneMap = {
+    amber: "text-amber-200 border-amber-300/20 bg-amber-300/10",
+    teal: "text-teal-200 border-teal-300/20 bg-teal-300/10",
   };
 
   return (
-    <span
-      className={`px-3 py-1 rounded-full text-xs font-medium ${styles[status]}`}
-    >
-      {status}
-    </span>
+    <div className={`rounded-[26px] border p-5 ${toneMap[tone]}`}>
+      <p className="text-sm uppercase tracking-[0.24em]">{label}</p>
+      <p className="mt-3 text-3xl font-black">{value}</p>
+    </div>
   );
+}
+
+function StatusBadge({ status }) {
+  const styles = {
+    PENDING: "bg-amber-400/15 text-amber-200",
+    APPROVED: "bg-emerald-400/15 text-emerald-200",
+    REJECTED: "bg-rose-400/15 text-rose-200",
+  };
+
+  return <span className={`rounded-full px-3 py-1 text-xs font-semibold ${styles[status]}`}>{status}</span>;
 }

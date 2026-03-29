@@ -4,20 +4,15 @@ import { motion } from "framer-motion";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 
-
-
-
 const AddProduct = () => {
-
-    const navigate = useNavigate();
-    const[loading,setLoading]=useState(false);
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
   const [form, setForm] = useState({
     title: "",
     description: "",
     pricePerDay: "",
     category: "",
   });
-
   const [imageFile, setImageFile] = useState(null);
   const [preview, setPreview] = useState(null);
 
@@ -32,11 +27,11 @@ const AddProduct = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-if(loading)  return
-setLoading(true)
+    if (loading) return;
+    setLoading(true);
+
     try {
       const formData = new FormData();
-
       formData.append("title", form.title);
       formData.append("description", form.description);
       formData.append("pricePerDay", form.pricePerDay);
@@ -55,108 +50,103 @@ setLoading(true)
       console.error(err);
       toast.error("Failed to add product");
     }
-setLoading(false)
+
+    setLoading(false);
   };
 
   return (
-    <div className="max-w-6xl mx-auto text-white">
+    <div className="space-y-8">
+      <div>
+        <p className="section-kicker">Create Listing</p>
+        <h1 className="hero-title mt-3 text-4xl font-black sm:text-5xl">Add a new rental product</h1>
+        <p className="muted-copy mt-4 max-w-2xl text-base leading-7">
+          Upload a strong image, set the pricing, and make the listing easy for renters to trust at a glance.
+        </p>
+      </div>
 
-      <motion.h1
-        initial={{ opacity: 0, y: 30 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="text-4xl font-bold mb-12 bg-gradient-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent"
-      >
-        Add New Product
-      </motion.h1>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-16">
-
-        {/* LEFT — IMAGE UPLOAD */}
+      <div className="grid gap-8 lg:grid-cols-[0.95fr_1.05fr]">
         <motion.div
           initial={{ opacity: 0, x: -40 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.5 }}
-          className="backdrop-blur-xl bg-white/5 border border-white/10 rounded-3xl p-8 shadow-xl"
+          className="glass-panel rounded-[32px] p-6 sm:p-8"
         >
-          <h2 className="text-xl font-semibold mb-6">
-            Upload Product Image
-          </h2>
+          <div className="mb-6 flex items-center justify-between gap-4">
+            <div>
+              <p className="section-kicker">Visual</p>
+              <h2 className="mt-2 text-2xl font-bold text-white">Upload product image</h2>
+            </div>
+            <span className="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm text-slate-300">
+              Best with clear lighting
+            </span>
+          </div>
 
-          <label className="flex flex-col items-center justify-center border-2 border-dashed border-white/20 rounded-2xl h-72 cursor-pointer hover:border-cyan-400 transition">
-
+          <label className="flex h-80 cursor-pointer flex-col items-center justify-center overflow-hidden rounded-[28px] border border-dashed border-white/20 bg-slate-950/30 transition hover:border-teal-300/60 hover:bg-slate-950/40">
             {preview ? (
-              <img
-                src={preview}
-                alt="Preview"
-                className="h-full object-cover rounded-2xl"
-              />
+              <img src={preview} alt="Preview" className="h-full w-full object-cover" />
             ) : (
-              <span className="text-gray-400">
-                Click to upload image
-              </span>
+              <div className="space-y-3 px-6 text-center">
+                <p className="text-xl font-semibold text-white">Drop in a strong cover image</p>
+                <p className="muted-copy text-sm">Wide, sharp photos make listings feel more trustworthy.</p>
+              </div>
             )}
 
-            <input
-              type="file"
-              hidden
-              onChange={(e) =>
-                handleImageChange(e.target.files[0])
-              }
-            />
+            <input type="file" hidden onChange={(e) => handleImageChange(e.target.files[0])} />
           </label>
         </motion.div>
 
-        {/* RIGHT — FORM */}
         <motion.form
           onSubmit={handleSubmit}
           initial={{ opacity: 0, x: 40 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.5 }}
-          className="backdrop-blur-xl bg-white/5 border border-white/10 rounded-3xl p-8 shadow-xl space-y-6"
+          className="glass-panel space-y-5 rounded-[32px] p-6 sm:p-8"
         >
-          <h2 className="text-xl font-semibold mb-4">
-            Product Details
-          </h2>
+          <div>
+            <p className="section-kicker">Details</p>
+            <h2 className="mt-2 text-2xl font-bold text-white">Tell renters what makes it useful</h2>
+          </div>
 
           <input
             name="title"
-            placeholder="Product Title"
+            placeholder="Product title"
             onChange={handleChange}
-            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 focus:ring-2 focus:ring-cyan-400 outline-none transition"
+            className="field-shell w-full"
           />
 
           <textarea
             name="description"
             placeholder="Description"
-            rows="4"
+            rows="5"
             onChange={handleChange}
-            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 focus:ring-2 focus:ring-cyan-400 outline-none transition"
+            className="field-shell w-full"
           />
 
-          <input
-            type="number"
-            name="pricePerDay"
-            placeholder="Price per day"
-            onChange={handleChange}
-            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 focus:ring-2 focus:ring-cyan-400 outline-none transition"
-          />
+          <div className="grid gap-4 sm:grid-cols-2">
+            <input
+              type="number"
+              name="pricePerDay"
+              placeholder="Price per day"
+              onChange={handleChange}
+              className="field-shell w-full"
+            />
 
-          <input
-            name="category"
-            placeholder="Category"
-            onChange={handleChange}
-            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 focus:ring-2 focus:ring-cyan-400 outline-none transition"
-          />
+            <input
+              name="category"
+              placeholder="Category"
+              onChange={handleChange}
+              className="field-shell w-full"
+            />
+          </div>
 
-         <button
-         type="submit"
-         disabled={loading}
-         className="w-full py-3 rounded-xl font-medium bg-gradient-to-r from-indigo-500 to-cyan-500 hover:scale-105 transition-all duration-300 shadow-lg disabled:opacity-50"
-         >
-         {loading ? "Adding..." : "Add Product"}
-         </button>
+          <button
+            type="submit"
+            disabled={loading}
+            className="cta-primary w-full rounded-2xl py-3 font-semibold text-slate-950 transition-all duration-300 disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            {loading ? "Adding..." : "Add Product"}
+          </button>
         </motion.form>
-
       </div>
     </div>
   );

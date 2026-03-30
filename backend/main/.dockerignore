@@ -1,0 +1,7 @@
+target
+logs
+uploads
+.idea
+.git
+.gitignore
+docker-compose.yml

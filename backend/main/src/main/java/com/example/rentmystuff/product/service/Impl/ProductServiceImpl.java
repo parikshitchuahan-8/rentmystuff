@@ -11,6 +11,7 @@ import com.example.rentmystuff.product.service.ProductService;
 import com.example.rentmystuff.product.specification.ProductSpecification;
 import com.example.rentmystuff.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -37,6 +38,9 @@ public class ProductServiceImpl implements ProductService {
     private final BookingRepository bookingRepository;
     private static final Logger logger =
             LoggerFactory.getLogger(ProductServiceImpl.class);
+
+    @Value("${app.upload.dir:uploads}")
+    private String uploadDir;
 
 
     @Override
@@ -228,7 +232,6 @@ public class ProductServiceImpl implements ProductService {
         }
 
         try {
-            String uploadDir = "uploads/";
             String fileName = UUID.randomUUID() + "_" + request.getImage().getOriginalFilename();
             Path filePath = Paths.get(uploadDir, fileName);
 

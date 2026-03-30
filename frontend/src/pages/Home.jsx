@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { FiArrowRight, FiRefreshCw, FiSearch, FiSliders } from "react-icons/fi";
 import { AuthContext } from "../context/AuthContext";
 import toast from "react-hot-toast";
+import { resolveAssetUrl } from "../api/config";
 
 export default function Home() {
   const { user } = useContext(AuthContext);
@@ -205,7 +206,7 @@ export default function Home() {
             >
               <div className="relative">
                 <img
-                  src={`http://localhost:8080/${product.imageUrl}`}
+                  src={resolveAssetUrl(product.imageUrl)}
                   alt={product.title}
                   className="h-64 w-full object-cover"
                 />

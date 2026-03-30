@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import api from "../api/axios";
 import { motion } from "framer-motion";
 import toast from "react-hot-toast";
+import { resolveAssetUrl } from "../api/config";
 
 export default function MyBookings() {
   const [bookings, setBookings] = useState([]);
@@ -75,7 +76,7 @@ export default function MyBookings() {
               className="glass-panel grid gap-6 rounded-[30px] p-5 sm:p-6 lg:grid-cols-[auto_1fr_auto] lg:items-center"
             >
               <img
-                src={`http://localhost:8080/${booking.imageUrl}`}
+                src={resolveAssetUrl(booking.imageUrl)}
                 alt={booking.productTitle}
                 className="h-24 w-full rounded-[22px] object-cover sm:w-28"
               />

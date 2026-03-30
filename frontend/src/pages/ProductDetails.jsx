@@ -4,6 +4,7 @@ import api, { getErrorMessage } from "../api/axios";
 import toast from "react-hot-toast";
 import { motion } from "framer-motion";
 import { AuthContext } from "../context/AuthContext";
+import { resolveAssetUrl } from "../api/config";
 
 export default function ProductDetails() {
   const { user } = useContext(AuthContext);
@@ -111,7 +112,7 @@ export default function ProductDetails() {
       >
         <div className="overflow-hidden rounded-[34px] border border-white/10 shadow-2xl shadow-black/20">
           <img
-            src={`http://localhost:8080/${product.imageUrl}`}
+            src={resolveAssetUrl(product.imageUrl)}
             alt={product.title}
             className="h-[420px] w-full object-cover sm:h-[520px]"
           />

@@ -1,9 +1,13 @@
 spring:
   datasource:
-    url: jdbc:postgresql://${DB_HOST}:5432/rentmyapp
-    username: ${DB_USER}
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
   jpa:
     hibernate:
-      ddl-auto: validate
+      ddl-auto: ${JPA_DDL_AUTO:validate}
     show-sql: false
+
+jwt:
+  secret: ${JWT_SECRET}
+  expiration: ${JWT_EXPIRATION:86400000}

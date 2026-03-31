@@ -83,12 +83,7 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
 
-        configuration.setAllowedOrigins(
-                Arrays.stream(allowedOrigins.split(","))
-                        .map(String::trim)
-                        .filter(origin -> !origin.isBlank())
-                        .toList()
-        );
+        configuration.setAllowedOrigins(List.of("https://rentmystuff.versel.app"));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);

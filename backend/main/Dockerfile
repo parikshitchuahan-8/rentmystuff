@@ -13,13 +13,13 @@ FROM eclipse-temurin:21-jre
 WORKDIR /app
 
 ENV SPRING_PROFILES_ACTIVE=prod
-ENV PORT=8080
+
 ENV UPLOAD_DIR=/app/uploads
 
 COPY --from=build /app/target/*.jar app.jar
 
 RUN mkdir -p /app/uploads /app/logs
 
-EXPOSE 8080
+EXPOSE 10000
 
 ENTRYPOINT ["java", "-Djava.security.egd=file:/dev/./urandom", "-jar", "/app/app.jar"]

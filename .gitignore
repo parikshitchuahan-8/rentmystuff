@@ -13,3 +13,9 @@ target
 # IDE
 .vscode
 .idea
+backend/.idea
+.codex-repos
+
+# runtime artifacts
+logs
+uploads

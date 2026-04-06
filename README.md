@@ -1,6 +1,6 @@
 # RentMyStuff
 
-RentMyStuff is a full-stack rental marketplace for listing products, browsing available items, and managing date-based bookings with owner approval.
+RentMyStuff is a full-stack rental marketplace for listing products, discovering rentable items, and managing date-based bookings with owner approval.
 
 The project is split into:
 
@@ -16,6 +16,10 @@ The project is split into:
 - Owner approval and rejection workflow
 - Booking cancellation and owner dashboard views
 - Responsive, polished UI across the main user flow
+
+## Why This Project Matters
+
+This repository is the strongest showcase project in the portfolio because it combines practical business logic, authentication, file handling, booking validation, and a modern frontend experience in one product.
 
 ## Tech Stack
 

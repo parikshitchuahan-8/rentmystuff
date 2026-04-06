@@ -1,119 +1,201 @@
 # RentMyStuff
 
-RentMyStuff is a full-stack rental marketplace where users can list products, upload images, and reserve items for specific dates.
+RentMyStuff is a full-stack rental marketplace for listing products, browsing available items, and managing date-based bookings with owner approval.
 
-## Stack
+The project is split into:
 
-- Frontend: React, Vite, Tailwind CSS, Framer Motion
-- Backend: Spring Boot 3, Spring Security, JWT, JPA
-- Database: PostgreSQL
+- `frontend` - React + Vite client
+- `backend/main` - Spring Boot API
 
-## Core Features
+## What It Does
 
-- JWT authentication
-- Product listing with image upload
-- Product browsing and filtering
-- Reservation flow with overlap protection
-- Owner approval dashboard
-- Booking cancellation
-- Responsive UI
+- User registration and login with JWT authentication
+- Product creation with image upload
+- Product browsing, search, and price/category filtering
+- Booking requests with overlap protection
+- Owner approval and rejection workflow
+- Booking cancellation and owner dashboard views
+- Responsive, polished UI across the main user flow
 
-## Project Layout
-
-- `frontend`: Vite React client
-- `backend/main`: Spring Boot API
-
-## Local Development
+## Tech Stack
 
 ### Frontend
 
-```bash
-cd frontend
-cp .env.example .env
-npm install
-npm run dev
-```
+- React 19
+- Vite
+- Tailwind CSS 4
+- Framer Motion
+- React Router
+- Axios
 
 ### Backend
 
-```bash
-cd backend/main
-cp .env.example .env
-./mvnw spring-boot:run
+- Spring Boot 3
+- Spring Security
+- JWT
+- Spring Data JPA / Hibernate
+- PostgreSQL
+- Maven
+
+## Project Structure
+
+```text
+rentmystuff/
+|-- frontend/               # React application
+|   |-- src/
+|   |   |-- api/
+|   |   |-- components/
+|   |   |-- context/
+|   |   `-- pages/
+|   `-- package.json
+|
+`-- backend/
+    `-- main/               # Spring Boot application
+        |-- src/main/java/com/example/rentmystuff/
+        |   |-- auth/
+        |   |-- booking/
+        |   |-- product/
+        |   |-- security/
+        |   `-- user/
+        |-- src/main/resources/
+        |-- pom.xml
+        `-- mvnw.cmd
 ```
 
-Default local URLs:
+## Local URLs
 
 - Frontend: `http://localhost:5173`
 - Backend API: `http://localhost:8080/api`
+- Uploaded files: `http://localhost:8080/uploads/...`
 
-## Environment Variables
+## Prerequisites
+
+- Node.js 18+
+- npm
+- Java 21
+- PostgreSQL running locally
+
+## Backend Setup
+
+1. Create a PostgreSQL database named `rentmyapp`.
+2. Review backend config in:
+
+```text
+backend/main/src/main/resources/application-dev.yml
+```
+
+3. Start the API:
+
+```powershell
+cd backend/main
+.\mvnw.cmd spring-boot:run
+```
+
+Notes:
+
+- The app currently uses the `dev` profile in local testing.
+- Uploaded product images are stored in the repo-level `uploads/` folder.
+- If your local database username/password differ, update `application-dev.yml` before starting.
+
+## Frontend Setup
+
+1. Install dependencies:
+
+```powershell
+cd frontend
+npm install
+```
+
+2. Start the client:
+
+```powershell
+npm run dev
+```
+
+Notes:
+
+- The frontend currently calls the backend at `http://localhost:8080/api`.
+- Static asset URLs are also currently built against `http://localhost:8080`.
+- If you change backend host/port, update the frontend API config in `frontend/src/api/axios.js`.
+
+## Build Commands
 
 ### Frontend
 
-Create `frontend/.env`:
-
-```bash
-VITE_API_BASE_URL=http://localhost:8080/api
-VITE_ASSET_BASE_URL=http://localhost:8080
-```
-
-### Backend
-
-Create `backend/main/.env`:
-
-```bash
-SPRING_PROFILES_ACTIVE=prod
-PORT=8080
-DB_URL=jdbc:postgresql://localhost:5432/rentmyapp
-DB_USERNAME=postgres
-DB_PASSWORD=postgres
-JWT_SECRET=replace-with-a-long-random-base64-secret
-JWT_EXPIRATION=86400000
-CORS_ALLOWED_ORIGINS=http://localhost:5173
-UPLOAD_DIR=uploads
-JPA_DDL_AUTO=validate
-```
-
-## Deployment Notes
-
-The repo is now set up so the frontend and backend can be deployed separately.
-
-### Frontend deployment
-
-- Set `VITE_API_BASE_URL` to your deployed backend API, for example `https://api.example.com/api`
-- Set `VITE_ASSET_BASE_URL` to your backend origin, for example `https://api.example.com`
-- Build command: `npm run build`
-- Output directory: `dist`
-
-### Backend deployment
-
-- Set `SPRING_PROFILES_ACTIVE=prod`
-- Provide `DB_URL`, `DB_USERNAME`, `DB_PASSWORD`, and `JWT_SECRET`
-- Set `CORS_ALLOWED_ORIGINS` to your deployed frontend URL
-- If you deploy with Docker, use `backend/main/Dockerfile`
-
-### Docker
-
-For a containerized backend plus Postgres locally:
-
-```bash
-cd backend/main
-docker compose up --build
-```
-
-## Build Checks
-
-Frontend:
-
-```bash
+```powershell
 cd frontend
 npm run build
 ```
 
-Backend:
+### Backend
 
-```bash
+```powershell
 cd backend/main
-./mvnw -DskipTests compile
+.\mvnw.cmd test
 ```
+
+## Main App Flows
+
+### Authentication
+
+- Register a standard user account
+- Log in to receive a JWT
+- Fetch the current user via `/api/users/current`
+
+### Products
+
+- Owners can create new listings with title, description, category, price, and image
+- Visitors can browse products without logging in
+- Owners can delete only their own products
+- Products with booking history are protected from deletion
+
+### Bookings
+
+- Renters request a booking by selecting start and end dates
+- The backend rejects overlapping requests
+- Owners can approve or reject pending bookings
+- Rejected bookings no longer block future date selection
+- Renters can cancel their own pending or approved bookings
+
+## API Overview
+
+### Auth
+
+- `POST /api/auth/register`
+- `POST /api/auth/login`
+
+### Users
+
+- `GET /api/users/current`
+
+### Products
+
+- `GET /api/products`
+- `GET /api/products/filter`
+- `GET /api/products/{id}`
+- `POST /api/products`
+- `PUT /api/products/{id}`
+- `DELETE /api/products/{id}`
+- `GET /api/products/{id}/unavailable-dates`
+
+### Bookings
+
+- `POST /api/bookings`
+- `GET /api/bookings/my`
+- `GET /api/bookings/owner`
+- `PUT /api/bookings/{id}/approve`
+- `PUT /api/bookings/{id}/reject`
+- `DELETE /api/bookings/{id}`
+
+## Current Notes
+
+- The backend `pom.xml` still contains duplicate dependency declarations that should be cleaned up.
+- The frontend `frontend/README.md` is still the default Vite template and can be trimmed or replaced later.
+- There are only minimal automated tests right now, so manual verification is still important after backend changes.
+
+## Recommended Next Improvements
+
+- Add targeted tests for auth, booking overlap, and product deletion rules
+- Move local secrets and DB config fully out of `application-dev.yml`
+- Add edit-product UI to match the backend update endpoint
+- Add booking calendar-style disabled dates instead of simple overlap messaging
